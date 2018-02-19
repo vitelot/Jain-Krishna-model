@@ -3,7 +3,7 @@ function main() {
   var runningFlag = true;
   var timer;
 
-  var nr_nodes = 10; // number of nodes
+  var nr_nodes = 100; // number of nodes
   var m = 0; // Erdos-Renyi parameter
   var rate = 500;
 
@@ -12,6 +12,7 @@ function main() {
       node_radius = 1;
 
   var force, nodes, links, node, link;
+  var eigval, eigv, Matrix;
 
   var svg = d3.select("#simulation").append("svg")
       .attr("width", width)
@@ -48,9 +49,11 @@ function main() {
   }
 
   function modelDynamics() {
-    let n1 = Math.floor(Math.random()*nr_nodes), n2;
-    let obj;
-    let i;
+    var n1 = Math.floor(Math.random()*nr_nodes), n2;
+    var obj;
+    var i;
+
+    findPerron();
 
     do {
       n2 = Math.floor(Math.random()*nr_nodes);
@@ -66,8 +69,10 @@ function main() {
     }
     if( i<links.length) {
       links.splice(i,1);
+      Matrix[n1][n2] = 0;
     } else {
       links.push(obj);
+      Matrix[n2][n1] = 1;
     }
 
     //d3.event.stopPropagation();
@@ -78,9 +83,21 @@ function main() {
 
     activateButtons();
 
-    let starting_nodes=[];
-    let i,j;
-    let x,y;
+    var starting_nodes=[];
+    var i,j;
+    var x,y;
+
+    eigv = new Array(nr_nodes);
+    Matrix = new Array(nr_nodes);
+    for( i=0; i< Matrix.length; i++) {
+      Matrix[i] = new Array(nr_nodes);
+      for( j=0; j< Matrix.length; j++) {
+        Matrix[i][j] = 0;
+      }
+    }
+    eigv = eigv.fill(1./nr_nodes);
+//    for( i=0; i< eigv.length; i++) { eigv[i] = 1./nr_nodes }
+    console.log(eigv);
 
     for (i=0; i<nr_nodes; i++) {
       x = Math.random() * width;
@@ -114,6 +131,7 @@ function main() {
       for (j=0; j<i; j++) {
         if(Math.random()<m) {
           links.push({source: i, target: j});
+          Matrix[j][i] = 1; // from i to j
         }
       }
     }
@@ -146,6 +164,37 @@ function main() {
 
     force.start();
   }
+
+function findPerron() {
+  var iter = 5;
+  var i,j;
+  var sum;
+  var vect = Array(nr_nodes);
+
+  eigv = eigv.fill(1.0);
+
+  while( iter-- > 0) {
+//    vect = eigv;
+    for(i=0; i<nr_nodes; i++) {
+      for(sum=j=0; j<nr_nodes; j++) {
+        sum += Matrix[i][j] * eigv[j];
+      }
+      vect[i] = sum;
+    }
+
+  //  for( i in eigv ) { sum += i; }
+    for( sum=i=0; i< vect.length; i++) { sum += vect[i]; }
+    if(sum>0) {
+      eigv = vect.map( x => x/sum );
+    }
+  }
+  for( sum=i=0; i< vect.length; i++) { sum += vect[i]; }
+  eigval  = sum;
+      
+  console.log(eigv);
+  console.log("eigval:" + eigval);
+}
+
 
   function pauseSym() {
     if (runningFlag) {
@@ -180,8 +229,6 @@ function main() {
         if(runningFlag) timer = setInterval(run, rate);
       });
     ////////////
-
-
   }
 
 }
