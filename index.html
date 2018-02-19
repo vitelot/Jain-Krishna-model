@@ -3,56 +3,39 @@
   <head>
     <meta charset="utf-8">
     <title>Jain-Krishna model</title>
+    <link rel="stylesheet" type="text/css" href="jkstyle.css">
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="./main.js"></script>
   </head>
 
-<style>
-
-body {
-  background-color: black;
-}
-
-rect {
-  fill: black;
-  stroke: white;
-  pointer-events: all;
-
-}
-
-.node {
-  fill: #f99;
-  stroke:#fff;
-}
-
-.cursor {
-  fill: none;
-  stroke: brown;
-  pointer-events: none;
-}
-
-.link {
-  stroke: #999;
-}
-
-.arrow{
-		stroke-width:2;
-		stroke:#999;
-}
-
-.arrowHead{
-		stroke-width:4;
-		stroke:#f00;
-    fill:#f00;
-}
-#arrowtip{
-		stroke-width:4;
-		stroke-dasharray:0;
-	}
-
-</style>
-
 <body>
-<script> main() </script>
+  <div id="wrapper">
+    <div id="header">
+      <h1>Jain-Krishna model</h1>
+      <div id="description">
+        <p>Description of the model</p>
+      </div>
+    </div>
+    <div id="simulation"></div>
+    <div id="parameters">
+      <div id="buttons">
+        <p><button id="pauseB">Pause</button></p>
+        <p>
+          <label for="mValue"> m = </label>
+          <input type="number" min="1" max="6" step="1" value="2" id="mValue">
+        <p>
+          <label for="rateValue"> rate = </label>
+          <input type="number" min="200" max="2000" step="100" value="800" id="rateValue">
+        </p>
+
+        <!-- <p><button id="restartB">Restart</button></p> -->
+      </div>
+
+    </div>
+    <div id="eigval"></div>
+    <div id="eigvect"></div>
+    <div id="footer">VDP Servedio@CSH Vienna</div>
+  </div>
+  <script> main() </script>
 </body>
 </html>

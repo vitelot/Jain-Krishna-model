@@ -1,6 +1,10 @@
+
 function main() {
+  var runningFlag = true;
+  var timer;
+
   var nr_nodes = 10; // number of nodes
-  var ER_p = 0; // Erdos-Renyi parameter
+  var m = 0; // Erdos-Renyi parameter
   var rate = 500;
 
   var width = 800,
@@ -9,7 +13,7 @@ function main() {
 
   var force, nodes, links, node, link;
 
-  var svg = d3.select("body").append("svg")
+  var svg = d3.select("#simulation").append("svg")
       .attr("width", width)
       .attr("height", height);
 
@@ -36,7 +40,7 @@ function main() {
   startup();
   restart();
 
-  var timer = setInterval(run, rate);
+  timer = setInterval(run, rate);
 
   function run() {
     modelDynamics();
@@ -71,6 +75,9 @@ function main() {
   }
 
   function startup() {
+
+    activateButtons();
+
     let starting_nodes=[];
     let i,j;
     let x,y;
@@ -105,7 +112,7 @@ function main() {
 
     for (i=0; i<nr_nodes; i++) {
       for (j=0; j<i; j++) {
-        if(Math.random()<ER_p) {
+        if(Math.random()<m) {
           links.push({source: i, target: j});
         }
       }
@@ -138,6 +145,43 @@ function main() {
         .remove();
 
     force.start();
+  }
+
+  function pauseSym() {
+    if (runningFlag) {
+      clearInterval(timer);
+      runningFlag = false;
+    } else {
+      timer = setInterval(run, rate);
+      runningFlag = true;
+    }
+  }
+
+  function restartSym() {
+    clearInterval(timer);
+  }
+
+  function activateButtons() {
+
+    ///// Buttons //////
+      d3.select("#pauseB")
+        .on("click", pauseSym);
+
+      d3.select("#restartB")
+        .on("click", restartSym);
+    ////////////////////
+    // inputs //
+      d3.select("#mValue").on("input", function() {
+        m = +this.value;
+      });
+      d3.select("#rateValue").on("input", function() {
+        rate = +this.value;
+        clearInterval(timer);
+        if(runningFlag) timer = setInterval(run, rate);
+      });
+    ////////////
+
+
   }
 
 }
