@@ -4,14 +4,15 @@ function main() {
   var timer;
 
   var nr_nodes = 50; // number of nodes
-  var m = 0; // Erdos-Renyi parameter
+  var m = .5/nr_nodes; // Erdos-Renyi parameter
   var rate = 500;
+  var pool_min = 5; // number of nodes to extract the minimum population
 
   var width = 600,
       height = 600,
       node_radius = 2;
 
-  var force, nodes, links, node, link;
+  var force, nodes=[], links=[], node, link;
   var eigval, Matrix;
 
   var eigv = new Array(nr_nodes);
@@ -130,10 +131,11 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
   }
 
   function modelDynamics() {
-    var n1 = Math.floor(Math.random()*nr_nodes), n2;
-    var obj;
+    //var n1 = Math.floor(Math.random()*nr_nodes), n2;
+    //var obj;
     var i;
     var maxscale;
+    var vector=[];
 
     findPerron();
     maxscale = d3.max(eigv);
@@ -151,28 +153,56 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
             .attr("y", function(d) { return y_eigvect(d); })
             .attr("height", function(d) { return height_eigvect - y_eigvect(d); });
 
-
-    do {
-      n2 = Math.floor(Math.random()*nr_nodes);
-    } while(n1 == n2);
-
-    obj = {source: n1, target: n2};
-
-    for (i=0; i< links.length; i++) {
-      if( (links[i].source.idx == n1 && links[i].target.idx == n2)||
-          (links[i].source.idx == n2 && links[i].target.idx == n1)) {
-        break;
-      }
+    for(i=0; i<eigv.length; i++) {
+      vector.push({idx:i, val:eigv[i]});
     }
-    if( i<links.length) {
-      links.splice(i,1);
-      Matrix[n1][n2] = 0;
-    } else {
-      links.push(obj);
-      Matrix[n2][n1] = 1;
-    }
+    //vector = eigv.slice(); // trick to copy an array by value
+    vector = vector.sort(function(a, b){return a.val - b.val}).splice(0,pool_min);
+    var rnd_item = vector[Math.floor(Math.random()*vector.length)].idx;
 
-    //d3.event.stopPropagation();
+//// implementation of Jain-Krishna
+    //links = links.filter( i => (i.source.idx !== rnd_item && i.target.idx !== rnd_item));
+    // cannot do filter since the vector links is bound to the force mechanism
+    i=0; do {
+        if(links[i].source.idx == rnd_item || links[i].target.idx == rnd_item) {
+          links.splice(i,1);
+          i--;
+        }
+        i++;
+    } while(i<links.length);
+
+    for (i=0,j=rnd_item; i<nr_nodes; i++) {
+        Matrix[i][j] = Matrix[j][i] = 0;
+        if(i!==j && Math.random()<m) {
+          links.push({source: i, target: j});
+          Matrix[j][i] = 1; // from i to j
+        }
+        if(i!==j && Math.random()<m) {
+          links.push({source: j, target: i});
+          Matrix[i][j] = 1; // from i to j
+        }
+    }
+////
+    // do {
+    //   n2 = Math.floor(Math.random()*nr_nodes);
+    // } while(n1 == n2);
+    //
+    // obj = {source: n1, target: n2};
+    //
+    // for (i=0; i< links.length; i++) {
+    //   if( (links[i].source.idx == n1 && links[i].target.idx == n2)){
+    //       //||(links[i].source.idx == n2 && links[i].target.idx == n1)) {
+    //     break;
+    //   }
+    // }
+    // if( i<links.length) {
+    //   links.splice(i,1);
+    //   Matrix[n1][n2] = 0;
+    // } else {
+    //   links.push(obj);
+    //   Matrix[n2][n1] = 1;
+    // }
+
     restart();
   }
 
@@ -204,16 +234,27 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
         y: y
       })
     }
+
+    for (i=0; i<nr_nodes; i++) {
+      for (j=0; j<nr_nodes; j++) {
+        if(i!==j && Math.random()<m) {
+          links.push({source: i, target: j});
+          Matrix[j][i] = 1; // from i to j
+        }
+      }
+    }
+
     force = d3.layout.force()
         .size([width, height])
-        .nodes(starting_nodes) // initialize with a single node
+        .nodes(starting_nodes)
+        .links(links)
         .linkDistance(30)
         .charge(-60)
         .gravity(0.05)
         .on("tick", tick);
 
     nodes = force.nodes();
-    links = force.links();
+//    links = force.links();
     node = svg.selectAll(".node");
     link = svg.selectAll(".link");
 
@@ -221,16 +262,11 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
 
     node.enter().insert("circle")
         .attr("class", "node")
-        .attr("r", node_radius);
+        .attr("id", function(d,i) { return "node-"+i;})
+        .attr("r", node_radius)
+        .append("svg:title")
+        .text(function(d,i){return i;});
 
-    for (i=0; i<nr_nodes; i++) {
-      for (j=0; j<i; j++) {
-        if(Math.random()<m) {
-          links.push({source: i, target: j});
-          Matrix[j][i] = 1; // from i to j
-        }
-      }
-    }
   }
 
   function tick() {
@@ -245,7 +281,7 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
 
   function restart() {
     //console.log(nodes);
-
+    //links = force.links();
     link = link.data(links);
 
     link.enter().insert("line", ".node")
@@ -262,7 +298,7 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
   }
 
   function findPerron() {
-    var iter = 5;
+    var iter = 10;
     var i,j;
     var sum;
     var vect = Array(nr_nodes);
@@ -287,7 +323,7 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
     eigval  = sum;
 
     //console.log(eigv);
-    console.log("eigval:" + eigval);
+    console.log("eigval:" + Math.round(1e3*eigval)/1e3);
   }
 
   function pauseSym() {
