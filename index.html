@@ -11,7 +11,7 @@
 <body>
   <div id="wrapper">
     <div id="header">
-      <h1>Jain-Krishna model</h1>
+      <h1>Jain-Krishna model (beta version)</h1>
       <div id="description">
         <p>Description of the model</p>
       </div>
@@ -22,14 +22,25 @@
       <div id="buttons">
         <p><button id="pauseB">Pause</button></p>
         <p>
-          <label for="mValue"> m = </label>
-          <input type="number" min="1" max="6" step="1" value="2" id="mValue">
+          <label for="mValue"> &lt;Kin&gt; = &lt;Kout&gt; = </label>
+          <input type="number" min="0" max="6" step="0.1" value="0.5" id="mValue">
+        </p>
+        <p>
+          <label for="poolValue"> pool = </label>
+          <input type="number" min="1" max="10" step="1" value="5" id="poolValue">
+        </p>
         <p>
           <label for="rateValue"> rate = </label>
           <input type="number" min="200" max="2000" step="100" value="500" id="rateValue">ms
         </p>
 
         <!-- <p><button id="restartB">Restart</button></p> -->
+
+        <div id="paramText">
+          <p><strong>&lt;Kin&gt;</strong>: average in-degree</p>
+          <p><strong>pool</strong>: number of least populated nodes to select from</p>
+          <p><strong>rate</strong>: simulation rate in milliseconds</p>
+        </div>
       </div>
 
     </div>
