@@ -3,7 +3,7 @@ function main() {
   var runningFlag = true;
   var timer;
 
-  var nr_nodes = 50; // number of nodes
+  var nr_nodes = 40; // number of nodes
   var Kin = 0.5; // average in-degree
   var rate = 500;
   var m = Kin/(nr_nodes-1);
@@ -209,13 +209,16 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
     var vector=[];
 
     findPerron();
+
     maxscale = d3.max(eigv);
     if(maxscale>0) {
       y_eigvect.domain([0, maxscale]);
+    } else {
+      maxscale = 1;
     }
     d3.select(".axis--y")
-    .attr("transform", "translate("+ x_eigvect(0) +","+ y_eigvect(maxscale) + ")")
-    .call(d3.svg.axis().scale(y_eigvect).orient("left"));
+      .attr("transform", "translate("+ x_eigvect(0) +","+ y_eigvect(maxscale) + ")")
+      .call(d3.svg.axis().scale(y_eigvect).orient("left"));
 
     g_eigvect.selectAll(".bar")
           .data(eigv)
@@ -237,7 +240,7 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
     //links = links.filter( i => (i.source.idx !== rnd_item && i.target.idx !== rnd_item));
     // cannot do filter since the vector links is bound to the force mechanism
     i=0; do {
-        if(links[i].source.idx == rnd_item || links[i].target.idx == rnd_item) {
+        if(links.length>0 && (links[i].source.idx == rnd_item || links[i].target.idx == rnd_item)) {
           links.splice(i,1);
           i--;
         }
@@ -297,9 +300,27 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
   function restart() {
   /////******************/////
 
+
+  // https://github.com/wbkd/d3-extended
+  // d3.selection.prototype.moveToFront = function() {
+  //   return this.each(function(){
+  //     this.parentNode.appendChild(this);
+  //   });
+  // };
+  // d3.selection.prototype.moveToBack = function() {
+  //     return this.each(function() {
+  //         var firstChild = this.parentNode.firstChild;
+  //         if (firstChild) {
+  //             this.parentNode.insertBefore(this, firstChild);
+  //         }
+  //     });
+  // };
+
+
     link = link.data(links);
 
     link.enter().insert("line", ".node")
+//        .moveToBack()
         .attr("class", "link")
         .attr({
 					"class":"arrow",
@@ -317,15 +338,17 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
   function findPerron() {
   /////******************/////
 
-    var iter = 10;
+    var iter = 10; // number of matrix multiplications to estimate PF eigval
+    const eps = 1e-6; // our machine zero value
     var i,j;
     var sum;
     var vect = Array(nr_nodes);
 
+    // start with a vector filled with ones
     eigv = eigv.fill(1.0);
 
     while( iter-- > 0) {
-  //    vect = eigv;
+      // multiply the adjacency matrix and the vector
       for(i=0; i<nr_nodes; i++) {
         for(sum=j=0; j<nr_nodes; j++) {
           sum += Matrix[i][j] * eigv[j];
@@ -334,8 +357,10 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
       }
 
       for( sum=i=0; i< vect.length; i++) { sum += vect[i]; }
-      if(sum>0) {
-        eigv = vect.map( x => x/sum );
+      if(sum>eps) {
+        eigv = vect.map( x => x/sum ); // thre is some positive element
+      } else {
+        eigv = eigv.fill(0.0);; // full of zeros
       }
     }
     for( sum=i=0; i< vect.length; i++) { sum += vect[i]; }
@@ -387,6 +412,7 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
       d3.select("#poolValue")
         .on("input", function() {
             pool_min = +this.value;
+            if(pool_min>nr_nodes) { pool_min = nr_nodes; }
       });
 
       d3.select("#rateValue")
