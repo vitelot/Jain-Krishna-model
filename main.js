@@ -279,7 +279,10 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
     restart();
   }
 
+  /////******************/////
+  /////******************/////
   function tick() {
+  /////******************/////
     link.attr("x1", function(d) { return d.source.x; })
         .attr("y1", function(d) { return d.source.y; })
         .attr("x2", function(d) { return d.target.x; })
@@ -289,9 +292,11 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
         .attr("cy", function(d) { return d.y; });
   }
 
+  /////******************/////
+  /////******************/////
   function restart() {
-    //console.log(nodes);
-    //links = force.links();
+  /////******************/////
+
     link = link.data(links);
 
     link.enter().insert("line", ".node")
@@ -307,7 +312,11 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
     force.start();
   }
 
+  /////******************/////
+  /////******************/////
   function findPerron() {
+  /////******************/////
+
     var iter = 10;
     var i,j;
     var sum;
@@ -336,7 +345,10 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
     console.log("eigval:" + Math.round(1e3*eigval)/1e3);
   }
 
+  /////******************/////
+  /////******************/////
   function pauseSym() {
+  /////******************/////
     if (runningFlag) {
       clearInterval(timer);
       runningFlag = false;
@@ -346,11 +358,17 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
     }
   }
 
+  /////******************/////
+  /////******************/////
   function restartSym() {
+  /////******************/////
     clearInterval(timer);
   }
 
+  /////******************/////
+  /////******************/////
   function activateButtons() {
+  /////******************/////
 
     ///// Buttons //////
       d3.select("#pauseB")
@@ -380,7 +398,10 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
     ////////////
   }
 
+  /////******************/////
+  /////******************/////
   function mouseovernode() {
+  /////******************/////
     var id = d3.select(this).datum().idx;
 
     d3.select("#bar-" + id)
@@ -392,7 +413,10 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
         .attr("r", 10);
   }
 
+  /////******************/////
+  /////******************/////
   function mouseoutnode() {
+  /////******************/////
     var id = d3.select(this).datum().idx;
 
     d3.select("#bar-"+id)
@@ -404,7 +428,10 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
         .attr("r", node_radius);
   }
 
+  /////******************/////
+  /////******************/////
   function mouseoverbar() {
+  /////******************/////
     var id = d3.select(this).attr("id");
     var idx = id.match(/\d+/)[0];
 
@@ -418,7 +445,10 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
         .style("fill", "green");
   }
 
+  /////******************/////
+  /////******************/////
   function mouseoutbar() {
+  /////******************/////
     var id = d3.select(this).attr("id");
     var idx = id.match(/\d+/)[0];
 
