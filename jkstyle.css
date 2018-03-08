@@ -25,8 +25,28 @@ body {
   border: 2px solid white;
   margin: 4px;
 }
-#parameters {
+
+#sidebar {
   margin: 4px;
+  float:right;
+  /* width: 200px;  calculated in main.js*/
+  /* border: 2px solid black; */
+  text-align: center;
+  position: relative;
+}
+
+#eigenvalue {
+  margin: 2px;
+  float:right;
+  /* width: 200px;  calculated in main.js*/
+  border: 2px solid black;
+  text-align: center;
+  position: relative;
+  background-color: #ddd;
+}
+
+#parameters {
+  padding: 2px;
   float:right;
   /* width: 200px;  calculated in main.js*/
   border: 2px solid black;
@@ -46,14 +66,14 @@ button {
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
 }
 
-#pauseB:hover {
+#pauseB:hover, #muteB:hover {
   background-color: #555;
   /* color: yellow; */
 }
-#pauseB:active {
+#pauseB:active, #muteB:active {
   background-color: #999;
 }
-#pauseB {
+#pauseB, #muteB {
     background-color: #999;
     border: none;
     border-radius: 12px;
@@ -71,6 +91,7 @@ button {
 }
 
 #paramText {
+  padding: 3px;
   position: absolute;
   font-size: 12px;
   /* font-weight: bold; */
@@ -106,6 +127,7 @@ button {
   background-color: #888;
   border: 2px solid white;
   margin: 4px;
+  clear: both;
 }
 
 #footer {

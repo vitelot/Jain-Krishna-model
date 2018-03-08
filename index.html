@@ -5,6 +5,7 @@
     <title>Jain-Krishna model</title>
     <link rel="stylesheet" type="text/css" href="jkstyle.css">
     <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="./Tone.min.js"></script>
     <script src="./main.js"></script>
   </head>
 
@@ -17,34 +18,40 @@
       </div>
     </div>
     <div id="simulation"></div>
-    <div id="parameters">
-      <h3>PARAMETERS</h3>
-      <div id="buttons">
-        <p><button id="pauseB">Pause</button></p>
-        <p>
-          <label for="mValue"> &lt;Kin&gt; = &lt;Kout&gt; = </label>
-          <input type="number" min="0" max="6" step="0.1" value="0.5" id="mValue">
-        </p>
-        <p>
-          <label for="poolValue"> pool = </label>
-          <input type="number" min="1" max="10" step="1" value="5" id="poolValue">
-        </p>
-        <p>
-          <label for="rateValue"> rate = </label>
-          <input type="number" min="200" max="2000" step="100" value="500" id="rateValue">ms
-        </p>
+    <div id="sidebar">
 
-        <!-- <p><button id="restartB">Restart</button></p> -->
+      <div id="parameters">
+        <div id="buttons">
+          <p><button id="muteB">Toggle sound</button></p>
+          <p><button id="pauseB">Pause</button></p>
+          <h3>PARAMETERS</h3>
+          <p>
+            <label for="mValue"> &lt;Kin&gt; = &lt;Kout&gt; = </label>
+            <input type="number" min="0" max="6" step="0.1" value="0.5" id="mValue">
+          </p>
+          <p>
+            <label for="poolValue"> pool = </label>
+            <input type="number" min="1" max="10" step="1" value="1" id="poolValue">
+          </p>
+          <p>
+            <label for="rateValue"> rate = </label>
+            <input type="number" min="100" max="2000" step="100" value="500" id="rateValue">ms
+          </p>
 
-        <div id="paramText">
-          <p><strong>&lt;Kin&gt;</strong>: average in-degree</p>
-          <p><strong>pool</strong>: number of least populated nodes to select from</p>
-          <p><strong>rate</strong>: simulation rate in milliseconds</p>
+          <!-- <p><button id="restartB">Restart</button></p> -->
+
+          <div id="paramText">
+            <p><strong>&lt;Kin&gt;</strong>: average in-degree</p>
+            <p><strong>pool</strong>: number of least populated nodes to select from</p>
+            <p><strong>rate</strong>: simulation rate in milliseconds</p>
+          </div>
         </div>
       </div>
-
+      <div id="eigenvalue">
+        <h3>PF eigenvalue</h3>
+        <h3 id="eigvalText"></h3>
+      </div>
     </div>
-    <div id="eigval"></div>
     <div id="eigvect"></div>
     <div id="footer">VDP Servedio@CSH Vienna</div>
   </div>

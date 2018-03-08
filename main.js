@@ -2,19 +2,24 @@
 function main() {
   var runningFlag = true;
   var timer;
+  var osc = new Tone.Oscillator({
+			"frequency" : 80,
+			"volume" : 0,
+      "mute" : true
+		}).toMaster();
 
   var nr_nodes = 40; // number of nodes
   var Kin = 0.5; // average in-degree
   var rate = 500;
   var m = Kin/(nr_nodes-1);
-  var pool_min = 5; // number of nodes to extract the minimum population
+  var pool_min = 1; // number of nodes to extract the minimum population
 
   var width = 600,
       height = 600,
       node_radius = 3;
 
   var force, nodes=[], links=[], node, link;
-  var eigval, Matrix;
+  var eigval = 0 , Matrix;
 
   var eigv = new Array(nr_nodes);
   eigv = eigv.fill(1./nr_nodes);
@@ -23,10 +28,20 @@ function main() {
   d3.select("#wrapper")
     .style("width", 25 + width*4/3 + "px");
 
+//// for the sidebar container
+  d3.select("#sidebar")
+    .style("width", width/3 + "px")
+    .style("height", height+"px");
+
 //// for the parameter panel
   d3.select("#parameters")
-  .style("width", width/3 + "px")
-  .style("height", height+"px");
+    .style("width", width/3 + "px")
+    .style("height", height*2/3+"px");
+
+//// for the eigenvalue panel
+  d3.select("#eigenvalue")
+    .style("width", width/3 + "px")
+    .style("height", height/3+"px");
 
 //// for the simulation
   var svg = d3.select("#simulation").append("svg")
@@ -125,7 +140,13 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
 
   timer = setInterval(run, rate);
 
-  function run() {
+/////******************/////
+/////******************/////
+    function run() {
+/////******************/////
+
+    osc.frequency.value = Math.floor(40*eigval+80);
+    //console.log(osc.frequency.value);
     modelDynamics();
     //pieDynamics();
   }
@@ -140,6 +161,8 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
     var starting_nodes=[];
     var i,j;
     var x,y;
+
+    osc.start();
 
 //    eigv = new Array(nr_nodes);
     Matrix = new Array(nr_nodes);
@@ -209,6 +232,9 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
     var vector=[];
 
     findPerron();
+
+    d3.select("#eigvalText")
+      .text(eigval.toFixed(3));
 
     maxscale = d3.max(eigv);
     if(maxscale>0) {
@@ -367,7 +393,7 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
     eigval  = sum;
 
     //console.log(eigv);
-    console.log("eigval:" + Math.round(1e3*eigval)/1e3);
+    //console.log("eigval:" + eigval.toFixed(3));
   }
 
   /////******************/////
@@ -381,6 +407,13 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
       timer = setInterval(run, rate);
       runningFlag = true;
     }
+  }
+
+  /////******************/////
+  /////******************/////
+  function muteSym() {
+  /////******************/////
+    osc.mute = !osc.mute;
   }
 
   /////******************/////
@@ -401,6 +434,10 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
 
       d3.select("#restartB")
         .on("click", restartSym);
+
+      d3.select("#muteB")
+        .on("click", muteSym);
+
     ////////////////////
     // inputs //
       d3.select("#mValue")
