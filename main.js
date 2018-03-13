@@ -2,8 +2,10 @@
 function main() {
   var runningFlag = true;
   var timer;
+  var maxSoundfreq = 500;
+  var minSoundfreq = 150;
   var osc = new Tone.Oscillator({
-			"frequency" : 80,
+			"frequency" : minSoundfreq,
 			"volume" : 0,
       "mute" : true
 		}).toMaster();
@@ -145,7 +147,7 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
     function run() {
 /////******************/////
 
-    osc.frequency.value = Math.floor(40*eigval+80);
+    osc.frequency.value = soundFreq(eigval);
     //console.log(osc.frequency.value);
     modelDynamics();
     //pieDynamics();
@@ -308,6 +310,14 @@ var x_eigvect = d3.scale.ordinal().rangeRoundBands([0, width_eigvect],0.1),
     restart();
   }
 
+  /////******************/////
+  /////******************/////
+  function soundFreq(x) {
+  /////******************/////
+    var expParam = Math.log(maxSoundfreq/minSoundfreq)/(1.0+Kin+Kin);
+
+    return Math.floor(minSoundfreq*Math.exp(x*expParam));
+  }
   /////******************/////
   /////******************/////
   function tick() {
